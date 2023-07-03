@@ -1,17 +1,22 @@
 <script>
-    import { createEventDispatcher } from "svelte";
-    const dispatch = createEventDispatcher();
+    import pollStore from "../../dist/stores/pollStore.js";
 
     export let poll;
 
     $: totalVotes = poll.votesA + poll.votesB;
-    $: percentA =
-        totalVotes > 0 ? Math.floor((100 / totalVotes) * poll.votesA) : 0;
-    $: percentB =
-        totalVotes > 0 ? Math.floor((100 / totalVotes) * poll.votesB) : 0;
+    $: percentA = totalVotes > 0 ? Math.floor((100 / totalVotes) * poll.votesA) : 0;
+    $: percentB = totalVotes > 0 ? Math.floor((100 / totalVotes) * poll.votesB) : 0;
 
     const handleVote = (option, id) => {
-        dispatch("vote", { option: option, id: id });
+        pollStore.update((currentPolls) => {
+            let tempPolls = [...currentPolls];
+            let upvotedPoll = tempPolls.find((poll) => poll.id == id);
+
+            if (option === "a") upvotedPoll.votesA += 1;
+            if (option === "b") upvotedPoll.votesB += 1;
+
+            return tempPolls;
+        });
     };
 </script>
 

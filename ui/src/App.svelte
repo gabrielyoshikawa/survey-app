@@ -10,36 +10,9 @@
         activeItem = event.detail;
     };
 
-    let polls = [
-        {
-            id: 1,
-            question: "A or B?",
-            answerA: "A",
-            answerB: "B",
-            votesA: 9,
-            votesB: 12,
-        },
-    ];
-
     const handleAdd = (event) => {
-        const poll = event.detail;
-        polls = [poll, ...polls];
-        console.log(polls);
         activeItem = "Current Polls";
     };
-
-    const handleVote = (event) => {
-        const { option, id } = event.detail;
-        
-        let tempPolls = [...polls];
-        let upvotedPoll = tempPolls.find((poll) => poll.id == id);
-
-        if (option === "a") upvotedPoll.votesA += 1;
-        if (option === "b") upvotedPoll.votesB += 1;
-
-        polls = tempPolls;
-
-    }
 
 </script>
 
@@ -47,7 +20,7 @@
     <div class="box">
         <Tabs {activeItem} {items} on:tabChange={tabChange} />
         {#if activeItem === "Current Polls"}
-            <PollList polls={polls} on:vote={handleVote} />
+            <PollList />
         {:else if activeItem === "Add New Poll"}
             <CreatePoll on:add={handleAdd} />
         {/if}
