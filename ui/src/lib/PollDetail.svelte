@@ -1,5 +1,7 @@
 <script>
-    import pollStore from "../../dist/stores/pollStore.js";
+    import store from "../../dist/stores/store.js";
+    import Button from "./Button.svelte";
+    import { tweened } from "svelte/motion";
 
     export let poll;
 
@@ -7,8 +9,14 @@
     $: percentA = totalVotes > 0 ? Math.floor((100 / totalVotes) * poll.votesA) : 0;
     $: percentB = totalVotes > 0 ? Math.floor((100 / totalVotes) * poll.votesB) : 0;
 
+    const tweenedA = tweened(0);
+    const tweenedB = tweened(0);
+
+    $: tweenedA.set(percentA);
+    $: tweenedB.set(percentB);
+
     const handleVote = (option, id) => {
-        pollStore.update((currentPolls) => {
+        store.update((currentPolls) => {
             let tempPolls = [...currentPolls];
             let upvotedPoll = tempPolls.find((poll) => poll.id == id);
 
@@ -18,6 +26,13 @@
             return tempPolls;
         });
     };
+
+    const handleDelete = (id) => {
+        store.update((currentPolls) => {
+            return currentPolls.filter((poll) => poll.id != id);
+        });
+    };
+
 </script>
 
 <div class="poll">
@@ -26,16 +41,22 @@
 
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="answer" on:click={() => handleVote("a", poll.id)}>
-        <div class="percent percent-a" style="width: {percentA}%">
+        <div class="percent percent-a" style="width: {$tweenedA}%">
             <span>{poll.answerA} ({poll.votesA}) </span>
         </div>
     </div>
 
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="answer" on:click={() => handleVote("b", poll.id)}>
-        <div class="percent percent-b" style="width: {percentB}%">
+        <div class="percent percent-b" style="width: {$tweenedB}%">
             <span>{poll.answerB} ({poll.votesB}) </span>
         </div>
+    </div>
+
+    <div class="delete">
+        <Button flat={true} on:click={() => handleDelete(poll.id)}
+            >Delete</Button
+        >
     </div>
 </div>
 
@@ -45,7 +66,7 @@
         display: flex;
         flex-direction: column;
         margin: 20px;
-        height: 200px;
+        height: 220px;
         min-width: 200px;
         justify-content: space-around;
         align-items: center;
@@ -72,12 +93,12 @@
         color: gray;
         font-size: 1.5em;
     }
-
+    
     .answer {
         background-color: #d8d8d8;
         cursor: pointer;
         width: 90%;
-        height: 20%;
+        height: 15%;
         font-size: 1.6em;
         display: flex;
     }
@@ -104,4 +125,10 @@
         background-color: rgb(159, 252, 159);
         border-left: 4px solid green;
     }
+
+    span {
+        min-width: fit-content;
+        width: 100%;
+        margin-left: 0.5rem;
+}
 </style>
